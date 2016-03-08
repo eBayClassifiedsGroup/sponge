@@ -83,8 +83,7 @@ def verify_password(username_or_token=None, password=None):
         set_current_user_as(user)
         return True
     elif not user:
-        password_file = config.set('security', 'passwd_file')
-        password_file_user = verify_password_file(password_file, username_or_token, password)
+        password_file_user = verify_password_file(username_or_token, password)
         if password_file_user:
             set_current_user_as(username_or_token)
             return True
@@ -104,7 +103,7 @@ def verify_token(token=None):
         return False
     token_user = token_manager.verify(token)
     if token_user:
-        set_current_user_as(User(token_user))
+        set_current_user_as(token_user)
         return True
 
 
@@ -129,8 +128,9 @@ def verify_ldap_access(username, password):
         return False
 
 
-def verify_password_file(password_file=None, username=None, password=None):
+def verify_password_file(username=None, password=None):
     app.logger.debug("Verify password file called")
+    password_file = config.get('security', 'passwd_file')
     with open(password_file) as f:
         for line in f:
             line = line.strip()
@@ -171,4 +171,3 @@ def get_token():
         'token': token.decode('ascii'),
         'duration': config.get('security', 'token_ttl')
     })
-

@@ -16,7 +16,6 @@ config.set('main', 'base_url', 'http://localhost:8080')
 
 config.add_section('security')
 config.set('security', 'enabled', 'false')
-config.set('security', 'method', 'file')
 config.set('security', 'passwd_file', os.path.dirname(__file__) + '/../etc/passwd')
 config.set('security', 'secret_key', 'change_me')
 # NOTE: orlo.__init__ checks that secret_key is not "change_me" when security is enabled

@@ -11,7 +11,7 @@ import base64
 
 __author__ = 'alforbes'
 
-USER = 'testuser'
+USERNAME = 'testuser'
 PASSWORD = 'blah'
 
 
@@ -31,6 +31,10 @@ def auth_required():
     response.status_code = 200
     return response
 
+@orlo.app.route('/test/user')
+@conditional_auth(user_auth.login_required)
+def get_resource():
+    return jsonify({'data': 'Hello, %s!' % g.current_user})
 
 class OrloAuthTest(TestCase):
     """
@@ -49,17 +53,18 @@ class OrloAuthTest(TestCase):
     def setUp(self):
         db.create_all()
         self.orig_security_enabled = orlo.config.get('security', 'enabled')
-        self.orig_security_method = orlo.config.get('security', 'method')
+        self.orig_security_secret_key = orlo.config.set('security', 'secret_key')
         orlo.config.set('security', 'enabled', 'true')
-        orlo.config.set('security', 'method', 'file')
+        orlo.config.set('security', 'secret_key', 'It does not matter how slowly you go so long as you do not stop')
+
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
         orlo.config.set('security', 'enabled', self.orig_security_enabled)
-        orlo.config.set('security', 'method', self.orig_security_method)
+        orlo.config.set('security', 'secret_key', self.orig_security_secret_key)
 
-    def get_with_basic_auth(self, path, username='testuser', password='blabla'):
+    def get_with_basic_auth(self, path, username='testuser', password='blah'):
         """
         Do a request with basic auth
 
